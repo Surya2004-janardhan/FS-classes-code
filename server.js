@@ -13,7 +13,7 @@ app.use(express.json());
 app.post("/verify-user", async (req, res) => {
   console.log(req.body);
   const data = req.body;
-    
+
   console.log(data);
 
   //   const { name, password } = userdata;
@@ -24,3 +24,5 @@ app.post("/verify-user", async (req, res) => {
 app.listen(port, () => {
   console.log("server running on port 5000");
 });
+
+// commit test
