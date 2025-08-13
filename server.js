@@ -40,8 +40,8 @@ app.post("/verify-user", async (req, res) => {
 
 // C    R    U      D  == damal finish ----
 // CREATE READ UPDATE DELETE
-
-app.post("/create-user", async (req, res) => {
+const middleware = require('./middleware/middleware')
+app.post("/create-user", middleware ,async (req, res) => {
   const userdata = req.body; //{ { } , { }, { }}
 
   console.log(userdata);
@@ -65,7 +65,7 @@ app.post("/create-user", async (req, res) => {
   // }
 });
 
-const callback = async (req , res) => {
+const callback = async (req, res) => {
   const allusers = await User.find();
   console.log(allusers);
   // user lo data mottham find -- total
@@ -77,29 +77,11 @@ const callback = async (req , res) => {
 
 app.get("/get-users", callback); // good practice
 
+// jwt -auth - middleware --
+// tmr
+// 3 days
 
-// jwt -auth - middleware -- 
-// tmr 
-// 3 days 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-app.delete("/delete-user/:id", async (req, res) => {
+app.delete("/delete-user/:id", middleware ,async (req, res) => {
   const username = req.params.id;
 
   const naauser = await User.findOne({ name: username });
@@ -114,22 +96,6 @@ app.delete("/delete-user/:id", async (req, res) => {
     res.status(400).json("database lo ledu");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const updatecallback = async (req, res) => {
   const username = req.params.id;
@@ -159,3 +125,63 @@ app.listen(port, () => {
 // fs-classes
 
 // mongodb+srv://fs-classes:fs-classes@fs-classes.w6glfk4.mongodb.net/?retryWrites=true&w=majority&appName=fs-classes
+
+const jwt = require("jsonwebtoken");
+const jwt_secret = "sijs";
+
+loginController = async (req, res) => {
+  const { email, password } = req.body;
+
+  const newuser = await User.findOne({ email });
+
+  if (!newuser) {
+    res.status(400).json({ message: "user not found " });
+  } else {
+    // user exist
+    const hashedpassword = await bcrypt.hash(password, 10);
+    // const isMatch = await bcrypt.compare(password, user.password);
+
+    if (newuser.password === hashedpassword) {
+      // 123 === 123
+      const token = jwt.sign({ username: email }, jwt_secret, {
+        expiresIn: "30h",
+      });
+      res.status(200).json({ message: "successfully logged in ", token });
+    } else {
+      res.status(400).json({ message: "please enter correct credentials" });
+    }
+  }
+};
+
+app.post("/login", loginController);
+
+const bcrypt = require("bcryptjs");
+singupcontroller = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  const newuser = await User.findOne({ email });
+
+  if (newuser) {
+    res.status(400).json({ message: "user with same email id exists" });
+  } else {
+    // aditya - fsjngjosngo - db store
+    //  aditya - fsakndsklfns -==
+
+    const hashedpassword = await bcrypt.hash(password, 10);
+    const newuser = new User({ name, email, hashedpassword });
+
+    await newuser.save();
+    res
+      .status(200)
+      .json({ message: "successfully registered continue to login -- " });
+  }
+};
+
+app.post("./singup", singupcontroller);
+
+
+// server setup db setup crud login singup jwt hashing 
+// backend completed 
+
+// frontend login singup 
+// fromtend crud 
