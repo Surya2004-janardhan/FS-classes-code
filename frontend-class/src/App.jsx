@@ -1,42 +1,22 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Body from "./components/Body";
-import Footer from "./components/Footer";
-import Test from "./components/Test";
-import Child from "./components/props";
-
-import { useEffect, useState } from "react";
+import Notes from "./components/Notes";
+import AddNote from "./components/AddNote";
+import "./App.css";
 export default function App() {
-  const [count, setCount] = useState(0);
-
-  const data = [];
-  useEffect(() => {
-
-    console.log("useEffect called");
-  }, [count ]);
-
-  const handlechange = () => {
-    setCount(count + 1);
-  };
-
   return (
-    <>
-    {data &&
-      <h1>{data}</h1>}
-          
-      <div>
-        <p>{count}</p>
-        <button
-          onClick={() => {
-            handlechange();
-          }}
-        >
-          click here{" "}
-        </button>
-        <Child name="janardhan" />
+    <Router>
+      <Navbar />
+      <div className="container">
+        <h5 className="helper">
+          If u click link up here that particular route will be rendered
+        </h5>
+        <Routes>
+          <Route path="/" element={<Notes />} />
+          <Route path="/add-note" element={<AddNote />} />
+        </Routes>
       </div>
-  
-
-    </>
+    </Router>
   );
 }

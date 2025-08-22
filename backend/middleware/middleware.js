@@ -1,29 +1,27 @@
-const jwt = require('jsonwebtoken')
-
+const jwt = require("jsonwebtoken");
 
 const jwt_secret = "sijs";
 
-export const middleware = (req,res,next) =>{
+const middleware = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header required" });
+  }
 
-    const tokendata = req.headers['authorization']
-    // bearer "isfjnsingisfngfns"
-    if(!token) {
-        return res.status(401)
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: "Token missing from authorization header" });
+  }
+
+  jwt.verify(token, jwt_secret, (err, userData) => {
+    if (err) {
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
-    const token = tokendata.split(" ")[1];
+    req.user = userData; // attach user data (e.g. email) to req.user
+    next();
+  });
+};
 
-    // token = isjgkgkdklmd
-    // secret 123
-    // {email : aditya@gmail.com}
-    // error 
-    jwt.verify(token, jwt_secret , (err,userdata ) =>{
-        if(err) {
-            return res.send("errpr")
-        }
-        req.userdata = userdata 
-        next() 
-
-    })
-
-
-}
+module.exports = middleware;
